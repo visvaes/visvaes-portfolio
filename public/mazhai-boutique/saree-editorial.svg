@@ -1,0 +1,24 @@
+<svg width="1400" height="1000" viewBox="0 0 1400 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="1400" height="1000" fill="#171D28"/>
+<circle cx="1110" cy="240" r="230" fill="#303A4B"/>
+<circle cx="1110" cy="240" r="170" fill="#8F7084" opacity=".48"/>
+<path d="M0 820C270 680 460 765 640 860C825 958 1050 832 1400 700V1000H0V820Z" fill="#6E1D45"/>
+<path d="M0 900C290 760 485 846 690 923C870 990 1110 885 1400 790V1000H0V900Z" fill="#D09B8E"/>
+<path d="M458 1000C428 850 440 694 519 567C572 482 645 421 723 401C786 385 853 403 890 449C837 489 804 552 794 635C782 742 820 866 879 1000H458Z" fill="#B87D90"/>
+<path d="M510 568C556 480 626 426 711 408C737 503 739 596 713 688C686 785 643 896 606 1000H458C434 841 445 697 510 568Z" fill="#D6A9AA"/>
+<path d="M573 460C615 402 671 366 729 360C782 355 822 380 851 428C813 464 760 484 700 485C646 485 606 477 573 460Z" fill="#402335"/>
+<path d="M613 368C619 294 674 246 740 249C810 252 857 303 849 380C823 407 795 422 757 423C686 422 639 403 613 368Z" fill="#A96F52"/>
+<path d="M637 332C658 273 704 246 758 252C796 257 824 279 840 318C808 303 772 301 735 315C700 328 670 346 637 370V332Z" fill="#351F2B"/>
+<path d="M654 423C625 462 597 499 575 550" stroke="#171D28" stroke-width="16" stroke-linecap="round"/>
+<path d="M709 485C759 485 809 474 851 439C907 548 932 706 961 1000H745C766 853 769 713 746 615L709 485Z" fill="#6F294F"/>
+<path d="M490 566C560 590 637 588 713 566M468 650C549 673 635 669 718 644M456 737C550 759 648 751 739 718M456 828C557 850 669 833 777 792M471 918C590 942 716 913 814 866" stroke="#F0C78D" stroke-width="11" opacity=".88"/>
+<path d="M869 452C974 426 1087 476 1195 586C1116 616 1040 688 981 774C936 681 903 565 869 452Z" fill="#B789A3"/>
+<path d="M899 475C994 470 1081 521 1151 587M876 530C968 532 1044 577 1104 632M867 589C938 601 997 638 1044 682" stroke="#E8C797" stroke-width="9" opacity=".9"/>
+<circle cx="690" cy="435" r="9" fill="#E8C797"/><circle cx="690" cy="435" r="25" stroke="#E8C797" stroke-width="4" opacity=".7"/>
+<text x="75" y="135" fill="#E8C797" font-family="Georgia, serif" font-size="30" letter-spacing="10">MAZHAI BOUTIQUE</text>
+<text x="75" y="215" fill="#F7F0EE" font-family="Georgia, serif" font-size="68">Elegance</text>
+<text x="75" y="292" fill="#D6A9AA" font-family="Georgia, serif" font-size="68" font-style="italic">in every thread.</text>
+<text x="79" y="347" fill="#F7F0EE" font-family="Arial, sans-serif" font-size="17" letter-spacing="4">A MODERN INDIAN FASHION EXPERIENCE</text>
+<path d="M79 386H390" stroke="#D6A9AA" stroke-width="2"/>
+<text x="79" y="913" fill="#F7F0EE" font-family="Arial, sans-serif" font-size="14" letter-spacing="4">PROJECT COVER / 01</text>
+</svg>
