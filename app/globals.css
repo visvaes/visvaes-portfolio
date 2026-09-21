@@ -19,4 +19,59 @@ a { color: inherit; text-decoration: none; }
 .reveal { animation: reveal .8s cubic-bezier(.2,.7,.2,1) both; }
 .delay-1 { animation-delay: .1s; } .delay-2 { animation-delay: .2s; } .delay-3 { animation-delay: .3s; }
 @keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+/* Scroll reveal (Intersection Observer driven) */
+.reveal-up { opacity: 0; transform: translateY(var(--reveal-y, 16px)); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); will-change: transform, opacity; }
+.reveal-up.is-visible { opacity: 1; transform: translateY(0); }
+
+/* Hero text reveal */
+.hero-line { display: block; overflow: hidden; }
+.hero-word { display: inline-block; animation: heroReveal .9s cubic-bezier(.16,1,.3,1) both; }
+.hero-word-delay-1 { animation-delay: .12s; }
+@keyframes heroReveal { from { transform: translateY(110%); } to { transform: translateY(0); } }
+
+/* Gentle floating motion for accent elements */
+.animate-float { animation: floatY 6s ease-in-out infinite; will-change: transform; }
+@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* Continuous subtle bob for toolkit icons */
+.skill-icon-float { display: inline-block; animation: skillBob 4.5s ease-in-out infinite; will-change: transform; }
+@keyframes skillBob { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(-4deg); } }
+.skill-card { position: relative; overflow: hidden; }
+.skill-card::after { content: ""; position: absolute; inset: 0; border: 1px solid transparent; transition: border-color .35s ease; pointer-events: none; }
+.skill-card:hover::after { border-color: rgba(239,118,86,.5); }
+
+/* Hero glow blob */
+.hero-glow { position: absolute; top: -8%; left: 50%; height: 480px; width: 480px; transform: translateX(-50%); border-radius: 9999px; background: radial-gradient(circle, rgba(239,118,86,.35), transparent 70%); filter: blur(60px); opacity: .55; animation: glowPulse 8s ease-in-out infinite; pointer-events: none; z-index: 0; }
+@keyframes glowPulse { 0%, 100% { opacity: .4; transform: translateX(-50%) scale(1); } 50% { opacity: .6; transform: translateX(-50%) scale(1.08); } }
+
+/* Floating contact dock */
+.animate-ping-slow { animation: pingSlow 2.4s cubic-bezier(0,0,.2,1) infinite; }
+@keyframes pingSlow { 0% { transform: scale(1); opacity: .55; } 75%, 100% { transform: scale(1.6); opacity: 0; } }
+
+/* Subtle sitewide background blobs + dots */
+.bg-blob { position: absolute; border-radius: 9999px; filter: blur(80px); opacity: .16; animation: blobDrift 30s ease-in-out infinite; will-change: transform; }
+.bg-blob-1 { top: -10%; left: -6%; height: 420px; width: 420px; background: #ef7656; animation-duration: 32s; }
+.bg-blob-2 { bottom: -16%; right: -8%; height: 480px; width: 480px; background: #dce9df; animation-duration: 36s; animation-delay: -8s; }
+@keyframes blobDrift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(36px, -28px) scale(1.08); } }
+.bg-dot { position: absolute; height: 6px; width: 6px; border-radius: 9999px; background: #ef7656; opacity: .3; animation: dotFloat 14s ease-in-out infinite; will-change: transform; }
+.bg-dot-1 { top: 22%; left: 12%; animation-duration: 15s; }
+.bg-dot-2 { top: 58%; left: 80%; animation-duration: 19s; animation-delay: -4s; }
+.bg-dot-3 { top: 38%; left: 48%; animation-duration: 17s; animation-delay: -9s; }
+.bg-dot-4 { top: 78%; left: 22%; animation-duration: 21s; animation-delay: -6s; }
+@keyframes dotFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+@media (max-width: 768px) { .bg-blob-2, .bg-dot-2, .bg-dot-4 { display: none; } }
+
+/* Page loader */
+.loader-letter { opacity: 0; transform: translateY(8px); animation: loaderIn .5s cubic-bezier(.16,1,.3,1) forwards; }
+.loader-letter-delay-1 { animation-delay: .08s; }
+.loader-letter-delay-2 { animation-delay: .2s; }
+.loader-dot { animation: loaderDot 1s ease-in-out infinite; }
+@keyframes loaderIn { to { opacity: 1; transform: translateY(0); } }
+@keyframes loaderDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: .5; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .reveal-up { opacity: 1 !important; transform: none !important; }
+  .hero-word { opacity: 1 !important; transform: none !important; }
+}

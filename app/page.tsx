@@ -1,5 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Reveal } from "./components/Reveal";
+import { Counter } from "./components/Counter";
+import { EducationTimeline } from "./components/EducationTimeline";
+import { ProgressReveal } from "./components/ProgressReveal";
+import { useInView } from "./hooks/useInView";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -158,14 +163,21 @@ function PlaceholderVisual({
       <div className="absolute -right-10 -top-12 h-48 w-48 rounded-full border-[28px] border-coral/30" />
       <div className="absolute bottom-[-70px] left-[-20px] h-56 w-56 rounded-full bg-[#f4c9a5]/60" />
       <div
-        className={`absolute left-[5%] top-[6%] w-[90%] overflow-hidden rounded-sm border border-ink/10 shadow-2xl shadow-ink/10 ${compact ? "bg-paper" : "bg-paper/90"}`}
+        className={`group/visual absolute left-[5%] top-[6%] w-[90%] overflow-hidden rounded-sm border border-ink/10 shadow-2xl shadow-ink/10 ${compact ? "bg-paper" : "bg-paper/90"}`}
       >
         {!compact ? (
-          <img
-            src={mazhaiImageUrl}
-            alt="Mazhai Boutique home page"
-            className="block h-auto w-full bg-paper object-contain"
-          />
+          <>
+            <img
+              src={mazhaiImageUrl}
+              alt="Mazhai Boutique home page"
+              className="block h-auto w-full scale-100 bg-paper object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04] group-hover/visual:scale-[1.04]"
+            />
+            <div className="pointer-events-none absolute inset-0 flex items-end justify-start bg-gradient-to-t from-ink/70 via-ink/0 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover/visual:opacity-100">
+              <span className="flex items-center gap-2 rounded-full bg-paper/95 px-4 py-2 text-xs font-bold uppercase tracking-widest text-ink">
+                View project <ArrowUpRight size={14} />
+              </span>
+            </div>
+          </>
         ) : (
           <>
             <div className="flex h-7 items-center gap-1.5 border-b border-ink/10 px-3">
@@ -201,6 +213,10 @@ function PlaceholderVisual({
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeId, setActiveId] = useState("top");
+  const projectVisualReveal = useInView<HTMLButtonElement>();
+  const projectDetailReveal = useInView<HTMLDivElement>();
   const nav = [
     ["About", "about"],
     ["Education", "education"],
@@ -209,9 +225,39 @@ export default function Home() {
     ["Projects", "projects"],
     ["Contact", "contact"],
   ];
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const ids = ["top", ...nav.map(([, id]) => id)];
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
+    );
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <main>
-      <header className="fixed left-0 right-0 top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur-md">
+    <main className="relative z-10">
+      <header
+        className={`fixed left-0 right-0 top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur-md transition-shadow duration-300 ${
+          scrolled ? "shadow-[0_8px_30px_-20px_rgba(23,37,44,0.35)]" : ""
+        }`}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <a
             href="#top"
@@ -222,11 +268,18 @@ export default function Home() {
           <nav className="hidden items-center gap-7 text-xs font-bold uppercase tracking-[.14em] text-ink/65 md:flex">
             {nav.map(([label, id]) => (
               <a
-                className="transition-colors hover:text-coral"
+                className={`relative pb-1 transition-colors hover:text-coral ${
+                  activeId === id ? "text-coral" : ""
+                }`}
                 key={id}
                 href={`#${id}`}
               >
                 {label}
+                <span
+                  className={`absolute -bottom-0.5 left-0 h-[2px] bg-coral transition-all duration-300 ${
+                    activeId === id ? "w-full" : "w-0"
+                  }`}
+                />
               </a>
             ))}
           </nav>
@@ -239,41 +292,49 @@ export default function Home() {
           <button
             aria-label="Toggle navigation"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="rounded-full border border-ink/15 p-2 md:hidden"
+            className="rounded-full border border-ink/15 p-2 transition-transform hover:-translate-y-0.5 md:hidden"
           >
             {menuOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
-        {menuOpen && (
-          <nav className="border-t border-ink/10 bg-paper px-5 py-5 md:hidden">
-            {nav.map(([label, id]) => (
-              <a
-                onClick={() => setMenuOpen(false)}
-                className="block border-b border-ink/10 py-3 text-sm font-bold uppercase tracking-wider"
-                key={id}
-                href={`#${id}`}
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-        )}
+        <nav
+          className={`overflow-hidden border-t border-ink/10 bg-paper px-5 transition-all duration-300 ease-out md:hidden ${
+            menuOpen ? "max-h-96 py-5 opacity-100" : "max-h-0 py-0 opacity-0"
+          }`}
+        >
+          {nav.map(([label, id]) => (
+            <a
+              onClick={() => setMenuOpen(false)}
+              className="block border-b border-ink/10 py-3 text-sm font-bold uppercase tracking-wider transition-colors hover:text-coral"
+              key={id}
+              href={`#${id}`}
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
       </header>
 
       <section
         id="top"
-        className="grid-paper overflow-hidden px-5 pb-20 pt-32 lg:px-8 lg:pb-28 lg:pt-44"
+        className="grid-paper relative overflow-hidden px-5 pb-20 pt-32 lg:px-8 lg:pb-28 lg:pt-44"
       >
-        <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.08fr_.92fr]">
+        <div className="hero-glow" aria-hidden="true" />
+        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.08fr_.92fr]">
           <div className="reveal">
             <p className="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[.22em] text-coral">
               <span className="h-px w-8 bg-coral" /> Available for freelance
               projects
             </p>
             <h1 className="max-w-3xl font-display text-[clamp(3.2rem,8vw,7rem)] font-medium leading-[.91] tracking-[-.06em]">
-              Building digital
-              <br />
-              <span className="text-coral">with intent.</span>
+              <span className="hero-line">
+                <span className="hero-word">Building digital</span>
+              </span>
+              <span className="hero-line">
+                <span className="hero-word hero-word-delay-1 text-coral">
+                  with intent.
+                </span>
+              </span>
             </h1>
             <p className="mt-8 max-w-xl text-base leading-7 text-ink/65 md:text-lg">
               I am Visvaeswaraiya Jayakumar, a Full Stack Web Developer building
@@ -282,19 +343,23 @@ export default function Home() {
             <div className="mt-9 flex flex-wrap gap-3">
               <a
                 href="#projects"
-                className="group flex items-center gap-3 rounded-full bg-coral px-5 py-3.5 text-sm font-bold text-white transition-transform hover:-translate-y-1"
+                className="group flex items-center gap-3 rounded-full bg-coral px-5 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:shadow-lg hover:shadow-coral/30"
               >
                 View my work{" "}
                 <ArrowDownRight
                   size={17}
-                  className="transition-transform group-hover:rotate-[-45deg]"
+                  className="transition-transform duration-300 group-hover:rotate-[-45deg]"
                 />
               </a>
               <a
                 href="#contact"
-                className="flex items-center gap-3 rounded-full border border-ink/20 px-5 py-3.5 text-sm font-bold transition-colors hover:border-ink hover:bg-white/50"
+                className="group flex items-center gap-3 rounded-full border border-ink/20 px-5 py-3.5 text-sm font-bold transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:border-ink hover:bg-white/50"
               >
-                Let's work together <ArrowUpRight size={17} />
+                Let's work together{" "}
+                <ArrowUpRight
+                  size={17}
+                  className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
+                />
               </a>
             </div>
             <div className="mt-14 flex items-center gap-5 text-ink/55">
@@ -304,30 +369,30 @@ export default function Home() {
               <a
                 href="#contact"
                 aria-label="GitHub placeholder"
-                className="transition-colors hover:text-coral"
+                className="transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
               >
                 <Github size={18} />
               </a>
               <a
                 href="#contact"
                 aria-label="LinkedIn placeholder"
-                className="transition-colors hover:text-coral"
+                className="transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
               >
                 <Linkedin size={18} />
               </a>
               <a
                 href="#contact"
                 aria-label="Fiverr placeholder"
-                className="font-bold transition-colors hover:text-coral"
+                className="font-bold transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
               >
                 fi.
               </a>
             </div>
           </div>
           <div className="reveal delay-2 relative mx-auto w-full max-w-[520px]">
-            <div className="absolute -left-4 top-8 h-16 w-16 border-l border-t border-coral" />
+            <div className="absolute -left-4 top-8 h-16 w-16 animate-float border-l border-t border-coral" />
             <div className="absolute -bottom-4 right-0 h-24 w-24 rounded-full border border-ink/20" />
-            <div className="relative rotate-2 bg-ink p-3 shadow-2xl shadow-ink/20">
+            <div className="relative rotate-2 bg-ink p-3 shadow-2xl shadow-ink/20 transition-transform duration-500 hover:rotate-0">
               <div className="flex items-center justify-between border-b border-white/15 px-3 py-3 text-[10px] font-mono uppercase tracking-widest text-paper/50">
                 <span>Selected work / 01</span>
                 <span>Full stack</span>
@@ -336,7 +401,7 @@ export default function Home() {
                 <PlaceholderVisual label="Mazhai Boutique / editable preview" />
               </div>
             </div>
-            <div className="absolute -bottom-7 -left-4 rotate-[-8deg] bg-[#f4c9a5] px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-widest">
+            <div className="absolute -bottom-7 -left-4 animate-float rotate-[-8deg] bg-[#f4c9a5] px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-widest">
               Design + build
             </div>
           </div>
@@ -349,42 +414,56 @@ export default function Home() {
       >
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.45fr_1fr]">
           <div>
-            <p className="section-label">01 / About</p>
-            <h2 className="mt-4 font-display text-4xl tracking-[-.04em] md:text-5xl">
-              Ideas into
-              <br />
-              useful things.
-            </h2>
+            <Reveal>
+              <p className="section-label">01 / About</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <h2 className="mt-4 font-display text-4xl tracking-[-.04em] md:text-5xl">
+                Ideas into
+                <br />
+                useful things.
+              </h2>
+            </Reveal>
           </div>
           <div className="max-w-3xl">
-            <p className="text-2xl leading-tight tracking-[-.03em] md:text-4xl">
-              I am a Full Stack Web Developer focused on building modern,
-              responsive and user-friendly websites and web applications.
-            </p>
-            <p className="mt-7 max-w-xl leading-7 text-ink/60">
-              I enjoy turning ideas into practical digital experiences using
-              modern web technologies, with a strong focus on clean interfaces,
-              performance and usability.
-            </p>
+            <Reveal delay={80}>
+              <p className="text-2xl leading-tight tracking-[-.03em] md:text-4xl">
+                I am a Full Stack Web Developer focused on building modern,
+                responsive and user-friendly websites and web applications.
+              </p>
+            </Reveal>
+            <Reveal delay={160}>
+              <p className="mt-7 max-w-xl leading-7 text-ink/60">
+                I enjoy turning ideas into practical digital experiences using
+                modern web technologies, with a strong focus on clean interfaces,
+                performance and usability.
+              </p>
+            </Reveal>
             <div className="mt-10 grid grid-cols-2 gap-6 border-t border-ink/10 pt-6 text-sm text-ink/60 md:grid-cols-3">
-              <div>
-                <strong className="block font-display text-2xl text-ink">
-                  01
-                </strong>
-                Featured project
-              </div>
-              <div>
-                <strong className="block font-display text-2xl text-ink">
-                  13
-                </strong>
-                Core technologies
-              </div>
-              <div>
-                <strong className="block font-display text-2xl text-ink">
-                  IN
-                </strong>
-                Based in India
-              </div>
+              <Reveal delay={0}>
+                <div className="transition-transform duration-300 hover:-translate-y-1">
+                  <strong className="block font-display text-2xl text-ink">
+                    <Counter value={1} format={(n) => String(n).padStart(2, "0")} />
+                  </strong>
+                  Featured project
+                </div>
+              </Reveal>
+              <Reveal delay={120}>
+                <div className="transition-transform duration-300 hover:-translate-y-1">
+                  <strong className="block font-display text-2xl text-ink">
+                    <Counter value={13} format={(n) => String(n).padStart(2, "0")} />
+                  </strong>
+                  Core technologies
+                </div>
+              </Reveal>
+              <Reveal delay={240}>
+                <div className="transition-transform duration-300 hover:-translate-y-1">
+                  <strong className="block font-display text-2xl text-ink">
+                    IN
+                  </strong>
+                  Based in India
+                </div>
+              </Reveal>
             </div>
           </div>
         </div>
@@ -414,22 +493,7 @@ export default function Home() {
               </p>
               <div className="mt-12 border-t border-ink/15 pt-6">
                 <p className="section-label">Education</p>
-                <div className="mt-5 grid gap-0">
-                  {education.map(([degree, school, years]) => (
-                    <div
-                      className="grid gap-2 border-b border-ink/15 py-5 md:grid-cols-[1fr_auto]"
-                      key={degree}
-                    >
-                      <div>
-                        <h3 className="font-display text-xl">{degree}</h3>
-                        <p className="mt-1 text-sm text-ink/60">{school}</p>
-                      </div>
-                      <span className="font-mono text-xs text-coral">
-                        {years}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <EducationTimeline items={education} />
               </div>
               <div className="mt-12 border-t border-ink/15 pt-6">
                 <p className="section-label">Strengths</p>
@@ -461,18 +525,17 @@ export default function Home() {
           </h3>
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             {educationProjects.map(([title, description], index) => (
-              <article
-                className="border border-ink/15 bg-white/35 p-5"
-                key={title}
-              >
-                <span className="font-mono text-xs text-coral">
-                  0{index + 2}
-                </span>
-                <h4 className="mt-8 font-display text-2xl">{title}</h4>
-                <p className="mt-4 text-sm leading-6 text-ink/60">
-                  {description}
-                </p>
-              </article>
+              <Reveal key={title} delay={index * 120}>
+                <article className="h-full border border-ink/15 bg-white/35 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-coral/40 hover:shadow-[0_18px_40px_-24px_rgba(23,37,44,0.35)]">
+                  <span className="font-mono text-xs text-coral">
+                    0{index + 2}
+                  </span>
+                  <h4 className="mt-8 font-display text-2xl">{title}</h4>
+                  <p className="mt-4 text-sm leading-6 text-ink/60">
+                    {description}
+                  </p>
+                </article>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -496,25 +559,31 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-12 grid border-l border-t border-ink/15 md:grid-cols-2 lg:grid-cols-4">
-            {services.map(([title, desc, Icon]) => {
+            {services.map(([title, desc, Icon], index) => {
               const ServiceIcon = Icon as typeof Globe2;
               return (
-                <div
-                  className="group border-b border-r border-ink/15 p-5 transition-colors hover:bg-paper"
-                  key={title as string}
-                >
-                  <ServiceIcon size={20} className="text-coral" />
-                  <h3 className="mt-10 font-display text-xl">
-                    {title as string}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-ink/60">
-                    {desc as string}
-                  </p>
-                  <ChevronRight
-                    size={17}
-                    className="mt-8 text-ink/35 transition-transform group-hover:translate-x-1"
-                  />
-                </div>
+                <Reveal key={title as string} delay={(index % 4) * 90}>
+                  <div className="group relative h-full border-b border-r border-ink/15 p-5 transition-all duration-300 hover:-translate-y-1 hover:bg-paper hover:shadow-[0_18px_40px_-24px_rgba(23,37,44,0.35)]">
+                    <span
+                      className="pointer-events-none absolute inset-0 border border-transparent transition-colors duration-300 group-hover:border-coral/40"
+                      aria-hidden="true"
+                    />
+                    <ServiceIcon
+                      size={20}
+                      className="text-coral transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <h3 className="mt-10 font-display text-xl transition-colors duration-300 group-hover:text-coral">
+                      {title as string}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-ink/60">
+                      {desc as string}
+                    </p>
+                    <ChevronRight
+                      size={17}
+                      className="mt-8 text-ink/35 transition-transform duration-300 group-hover:translate-x-2 group-hover:text-coral"
+                    />
+                  </div>
+                </Reveal>
               );
             })}
           </div>
@@ -541,19 +610,23 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-12 grid grid-cols-2 border-l border-t border-paper/15 sm:grid-cols-3 lg:grid-cols-5">
-            {skills.map((skill) => (
-              <div
-                key={skill.name}
-                className="group border-b border-r border-paper/15 p-4 transition-colors hover:bg-paper hover:text-ink md:p-5"
-              >
-                <span className="font-mono text-[11px] text-coral">
-                  {skill.icon}
-                </span>
-                <h3 className="mt-8 text-sm font-bold">{skill.name}</h3>
-                <p className="mt-1 text-[10px] uppercase tracking-widest text-paper/40 group-hover:text-ink/50">
-                  {skill.type}
-                </p>
-              </div>
+            {skills.map((skill, index) => (
+              <Reveal key={skill.name} delay={(index % 5) * 80}>
+                <div className="skill-card group border-b border-r border-paper/15 p-4 transition-all duration-300 hover:-translate-y-1.5 hover:bg-paper hover:text-ink hover:shadow-[0_20px_45px_-28px_rgba(239,118,86,0.55)] md:p-5">
+                  <span
+                    className="skill-icon-float font-mono text-[11px] text-coral transition-transform duration-300 group-hover:scale-125"
+                    style={{ animationDelay: `${(index % 5) * 0.3}s` }}
+                  >
+                    {skill.icon}
+                  </span>
+                  <h3 className="mt-8 text-sm font-bold transition-transform duration-300 group-hover:translate-x-0.5">
+                    {skill.name}
+                  </h3>
+                  <p className="mt-1 text-[10px] uppercase tracking-widest text-paper/40 transition-colors duration-300 group-hover:text-ink/60">
+                    {skill.type}
+                  </p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -575,12 +648,17 @@ export default function Home() {
           </div>
           <div className="mt-12 grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
             <button
+              ref={projectVisualReveal.ref}
               onClick={() => setLightbox("Mazhai Boutique")}
-              className="text-left"
+              className={`group reveal-up ${projectVisualReveal.inView ? "is-visible" : ""} text-left transition-transform duration-300 hover:-translate-y-1`}
             >
               <PlaceholderVisual label="Click to open gallery" />
             </button>
-            <div className="flex flex-col justify-between border-t border-ink/15 pt-5 lg:border-l lg:border-t-0 lg:pl-8">
+            <div
+              ref={projectDetailReveal.ref}
+              className={`reveal-up ${projectDetailReveal.inView ? "is-visible" : ""} flex flex-col justify-between border-t border-ink/15 pt-5 lg:border-l lg:border-t-0 lg:pl-8`}
+              style={{ transitionDelay: projectDetailReveal.inView ? "120ms" : "0ms" }}
+            >
               <div>
                 <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-ink/50">
                   <span>E-commerce website</span>
@@ -605,7 +683,7 @@ export default function Home() {
                     "Cloudinary",
                   ].map((item) => (
                     <span
-                      className="rounded-full border border-ink/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider"
+                      className="rounded-full border border-ink/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 hover:-translate-y-0.5 hover:border-coral hover:text-coral"
                       key={item}
                     >
                       {item}
@@ -637,15 +715,23 @@ export default function Home() {
                     href="https://www.mazhaiboutique.com/"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-2 text-sm font-bold text-coral"
+                    className="group flex items-center gap-2 text-sm font-bold text-coral transition-transform duration-300 hover:-translate-y-0.5"
                   >
-                    Live demo <ExternalLink size={15} />
+                    Live demo{" "}
+                    <ExternalLink
+                      size={15}
+                      className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5"
+                    />
                   </a>
                   <a
                     href="#contact"
-                    className="flex items-center gap-2 text-sm font-bold"
+                    className="group flex items-center gap-2 text-sm font-bold transition-transform duration-300 hover:-translate-y-0.5"
                   >
-                    View project <ArrowUpRight size={15} />
+                    View project{" "}
+                    <ArrowUpRight
+                      size={15}
+                      className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5"
+                    />
                   </a>
                 </div>
               </div>
@@ -672,25 +758,31 @@ export default function Home() {
             </p>
           </div>
           <div className="mt-12 grid border-l border-t border-ink/15 md:grid-cols-2 lg:grid-cols-4">
-            {services.map(([title, desc, Icon]) => {
+            {services.map(([title, desc, Icon], index) => {
               const ServiceIcon = Icon as typeof Globe2;
               return (
-                <div
-                  className="group border-b border-r border-ink/15 p-5 transition-colors hover:bg-paper"
-                  key={title as string}
-                >
-                  <ServiceIcon size={20} className="text-coral" />
-                  <h3 className="mt-10 font-display text-xl">
-                    {title as string}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-ink/60">
-                    {desc as string}
-                  </p>
-                  <ChevronRight
-                    size={17}
-                    className="mt-8 text-ink/35 transition-transform group-hover:translate-x-1"
-                  />
-                </div>
+                <Reveal key={title as string} delay={(index % 4) * 90}>
+                  <div className="group relative h-full border-b border-r border-ink/15 p-5 transition-all duration-300 hover:-translate-y-1 hover:bg-paper hover:shadow-[0_18px_40px_-24px_rgba(23,37,44,0.35)]">
+                    <span
+                      className="pointer-events-none absolute inset-0 border border-transparent transition-colors duration-300 group-hover:border-coral/40"
+                      aria-hidden="true"
+                    />
+                    <ServiceIcon
+                      size={20}
+                      className="text-coral transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <h3 className="mt-10 font-display text-xl transition-colors duration-300 group-hover:text-coral">
+                      {title as string}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-ink/60">
+                      {desc as string}
+                    </p>
+                    <ChevronRight
+                      size={17}
+                      className="mt-8 text-ink/35 transition-transform duration-300 group-hover:translate-x-2 group-hover:text-coral"
+                    />
+                  </div>
+                </Reveal>
               );
             })}
           </div>
@@ -700,24 +792,27 @@ export default function Home() {
       <section className="px-5 py-20 lg:px-8 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.45fr_1fr]">
           <div>
-            <p className="section-label">05 / Approach</p>
-            <h2 className="mt-4 font-display text-4xl tracking-[-.04em] md:text-5xl">
-              Thoughtful by
-              <br />
-              default.
-            </h2>
+            <Reveal>
+              <p className="section-label">05 / Approach</p>
+            </Reveal>
+            <Reveal delay={100}>
+              <h2 className="mt-4 font-display text-4xl tracking-[-.04em] md:text-5xl">
+                Thoughtful by
+                <br />
+                default.
+              </h2>
+            </Reveal>
           </div>
           <div className="grid gap-0 border-t border-ink/15 sm:grid-cols-2">
             {approach.map((item, i) => (
-              <div
-                className="flex items-center gap-4 border-b border-ink/15 py-4 text-sm text-ink/70"
-                key={item}
-              >
-                <span className="font-mono text-[10px] text-coral">
-                  0{i + 1}
-                </span>
-                {item}
-              </div>
+              <Reveal key={item} delay={(i % 6) * 70}>
+                <div className="flex items-center gap-4 border-b border-ink/15 py-4 text-sm text-ink/70 transition-transform duration-300 hover:translate-x-1">
+                  <span className="font-mono text-[10px] text-coral">
+                    0{i + 1}
+                  </span>
+                  {item}
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -725,77 +820,99 @@ export default function Home() {
 
       <section className="bg-mint px-5 py-20 lg:px-8 lg:py-28">
         <div className="mx-auto max-w-7xl">
-          <p className="section-label">06 / Experience</p>
-          <div className="mt-10 grid gap-8 border-t border-ink/15 pt-6 md:grid-cols-[.3fr_1fr_auto]">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50">
-              Project-based
-            </div>
-            <div>
-              <h3 className="font-display text-3xl">
-                Full Stack Web Developer
-              </h3>
-              <p className="mt-1 font-mono text-xs uppercase tracking-widest text-coral">
-                Mazhai Boutique
-              </p>
-              <p className="mt-5 max-w-xl text-sm leading-7 text-ink/65">
-                Designed and developed a modern e-commerce website with a
-                responsive interface, product browsing, shopping functionality
-                and supporting full stack integrations.
-              </p>
-            </div>
-            <div className="text-sm text-ink/50">Freelance / Project</div>
+          <Reveal>
+            <p className="section-label">06 / Experience</p>
+          </Reveal>
+          <div className="mt-10 border-t border-ink/15">
+            <ProgressReveal>
+              <div className="grid gap-8 md:grid-cols-[.3fr_1fr_auto]">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50">
+                  Project-based
+                </div>
+                <div>
+                  <h3 className="font-display text-3xl">
+                    Full Stack Web Developer
+                  </h3>
+                  <p className="mt-1 font-mono text-xs uppercase tracking-widest text-coral">
+                    Mazhai Boutique
+                  </p>
+                  <p className="mt-5 max-w-xl text-sm leading-7 text-ink/65">
+                    Designed and developed a modern e-commerce website with a
+                    responsive interface, product browsing, shopping functionality
+                    and supporting full stack integrations.
+                  </p>
+                </div>
+                <div className="text-sm text-ink/50">Freelance / Project</div>
+              </div>
+            </ProgressReveal>
           </div>
         </div>
       </section>
 
       <section
         id="contact"
-        className="bg-ink px-5 py-20 text-paper lg:px-8 lg:py-28"
+        className="relative overflow-hidden bg-ink px-5 py-20 text-paper lg:px-8 lg:py-28"
       >
-        <div className="mx-auto max-w-7xl">
-          <p className="section-label text-coral">07 / Contact</p>
-          <h2 className="mt-5 max-w-lg font-display text-5xl leading-[.95] tracking-[-.05em] md:text-7xl">
-            Let's build something <span className="text-coral">great</span>{" "}
-            together.
-          </h2>
-          <p className="mt-7 max-w-md leading-7 text-paper/55">
-            Have a project in mind? Share a few details and I will have a look.
-            I am available by email, phone, WhatsApp, or LinkedIn.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-x-5 gap-y-4 text-sm text-paper/60">
-            <a
-              href="mailto:visvaeswaraiyajayakumar@gmail.com"
-              aria-label="Email Visvaeswaraiya Jayakumar"
-              className="flex items-center gap-2 hover:text-coral"
-            >
-              <Mail size={16} /> Email
-            </a>
-            <a
-              href="tel:+918754731787"
-              aria-label="Call Visvaeswaraiya Jayakumar"
-              className="flex items-center gap-2 hover:text-coral"
-            >
-              <Phone size={16} /> Phone
-            </a>
-            <a
-              href="https://wa.me/918754731787"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Message on WhatsApp"
-              className="flex items-center gap-2 hover:text-coral"
-            >
-              <MessageCircle size={16} /> WhatsApp
-            </a>
-            <a
-              href="https://www.linkedin.com/in/visvaeswaraiya-jayakumar-405b0942b"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Visvaeswaraiya Jayakumar on LinkedIn"
-              className="flex items-center gap-2 hover:text-coral"
-            >
-              <Linkedin size={16} /> LinkedIn
-            </a>
-          </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 animate-float rounded-full bg-coral/20 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-paper/10 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-7xl">
+          <Reveal>
+            <p className="section-label text-coral">07 / Contact</p>
+          </Reveal>
+          <Reveal delay={100}>
+            <h2 className="mt-5 max-w-lg font-display text-5xl leading-[.95] tracking-[-.05em] md:text-7xl">
+              Let's build something <span className="text-coral">great</span>{" "}
+              together.
+            </h2>
+          </Reveal>
+          <Reveal delay={180}>
+            <p className="mt-7 max-w-md leading-7 text-paper/55">
+              Have a project in mind? Share a few details and I will have a look.
+              I am available by email, phone, WhatsApp, or LinkedIn.
+            </p>
+          </Reveal>
+          <Reveal delay={260}>
+            <div className="mt-10 flex flex-wrap gap-x-5 gap-y-4 text-sm text-paper/60">
+              <a
+                href="mailto:visvaeswaraiyajayakumar@gmail.com"
+                aria-label="Email Visvaeswaraiya Jayakumar"
+                className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
+              >
+                <Mail size={16} className="transition-transform duration-300 group-hover:scale-110" /> Email
+              </a>
+              <a
+                href="tel:+918754731787"
+                aria-label="Call Visvaeswaraiya Jayakumar"
+                className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
+              >
+                <Phone size={16} className="transition-transform duration-300 group-hover:scale-110" /> Phone
+              </a>
+              <a
+                href="https://wa.me/918754731787"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Message on WhatsApp"
+                className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
+              >
+                <MessageCircle size={16} className="transition-transform duration-300 group-hover:scale-110" /> WhatsApp
+              </a>
+              <a
+                href="https://www.linkedin.com/in/visvaeswaraiya-jayakumar-405b0942b"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Visvaeswaraiya Jayakumar on LinkedIn"
+                className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
+              >
+                <Linkedin size={16} className="transition-transform duration-300 group-hover:scale-110" /> LinkedIn
+              </a>
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -827,7 +944,8 @@ export default function Home() {
           role="dialog"
           aria-modal="true"
           aria-label="Project gallery"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/90 p-5"
+          className="reveal-up is-visible fixed inset-0 z-50 flex items-center justify-center bg-ink/90 p-5"
+          style={{ transitionDuration: "300ms" }}
           onClick={() => setLightbox(null)}
         >
           <div
@@ -844,16 +962,18 @@ export default function Home() {
               <button
                 aria-label="Close gallery"
                 onClick={() => setLightbox(null)}
-                className="rounded-full border border-paper/30 p-2"
+                className="rounded-full border border-paper/30 p-2 transition-all duration-300 hover:rotate-90 hover:border-coral hover:text-coral"
               >
                 <X size={20} />
               </button>
             </div>
             <div className="overflow-hidden rounded-[2px] border border-paper/20 bg-paper">
               <img
+                key={lightbox}
                 src={mazhaiCollectionsUrl}
                 alt="Mazhai Boutique collections page"
-                className="max-h-[62vh] w-full object-contain"
+                className="reveal-up is-visible max-h-[62vh] w-full object-contain"
+                style={{ transitionDuration: "500ms" }}
               />
             </div>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
@@ -861,9 +981,9 @@ export default function Home() {
                 <button
                   key={item}
                   onClick={() => setLightbox(item)}
-                  className="border border-paper/20 p-3 text-left text-[10px] uppercase tracking-wider text-paper/60 hover:border-coral hover:text-paper"
+                  className="group border border-paper/20 p-3 text-left text-[10px] uppercase tracking-wider text-paper/60 transition-all duration-300 hover:-translate-y-0.5 hover:border-coral hover:text-paper"
                 >
-                  <span className="mb-6 block h-14 bg-paper/10" />
+                  <span className="mb-6 block h-14 bg-paper/10 transition-transform duration-300 group-hover:scale-[1.03]" />
                   {item}
                 </button>
               ))}
@@ -882,35 +1002,35 @@ export default function Home() {
           <a
             href="mailto:visvaeswaraiyajayakumar@gmail.com"
             aria-label="Email Visvaeswaraiya Jayakumar"
-            className="flex items-center gap-2 hover:text-coral"
+            className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
           >
-            <Mail size={17} className="text-coral" />{" "}
+            <Mail size={17} className="text-coral transition-transform duration-300 group-hover:scale-110" />{" "}
             visvaeswaraiyajayakumar@gmail.com
           </a>
           <a
             href="tel:+918754731787"
             aria-label="Call Visvaeswaraiya Jayakumar"
-            className="flex items-center gap-2 hover:text-coral"
+            className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
           >
-            <Phone size={17} className="text-coral" /> +91 87547 31787
+            <Phone size={17} className="text-coral transition-transform duration-300 group-hover:scale-110" /> +91 87547 31787
           </a>
           <a
             href="https://wa.me/918754731787"
             target="_blank"
             rel="noreferrer"
             aria-label="Message on WhatsApp"
-            className="flex items-center gap-2 hover:text-coral"
+            className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
           >
-            <MessageCircle size={17} className="text-coral" /> WhatsApp
+            <MessageCircle size={17} className="text-coral transition-transform duration-300 group-hover:scale-110" /> WhatsApp
           </a>
           <a
             href="https://www.linkedin.com/in/visvaeswaraiya-jayakumar-405b0942b"
             target="_blank"
             rel="noreferrer"
             aria-label="Visvaesraiya Jayakumar on LinkedIn"
-            className="flex items-center gap-2 hover:text-coral"
+            className="group flex items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 hover:text-coral"
           >
-            <Linkedin size={17} className="text-coral" /> LinkedIn
+            <Linkedin size={17} className="text-coral transition-transform duration-300 group-hover:scale-110" /> LinkedIn
           </a>
         </div>
       </section>
