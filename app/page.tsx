@@ -42,6 +42,24 @@ const skills = [
   { name: "Git", type: "Tools & Services", icon: "git" },
   { name: "GitHub", type: "Tools & Services", icon: "GH" },
   { name: "Cloudinary", type: "Tools & Services", icon: "C" },
+  { name: "Generative AI", type: "AI & Generative AI", icon: "AI" },
+  { name: "Large Language Models (LLMs)", type: "AI & Generative AI", icon: "LLM" },
+  { name: "RAG", type: "AI & Generative AI", icon: "RAG" },
+  { name: "Prompt Engineering", type: "AI & Generative AI", icon: "P" },
+  { name: "AI Agents", type: "AI & Generative AI", icon: "AG" },
+  { name: "Embeddings", type: "AI & Generative AI", icon: "EM" },
+  { name: "Vector Databases", type: "AI & Generative AI", icon: "DB" },
+  { name: "MCP (Model Context Protocol)", type: "AI & Generative AI", icon: "MCP" },
+  { name: "Python", type: "Backend & APIs", icon: "Py" },
+  { name: "Gmail API", type: "Backend & APIs", icon: "G" },
+  { name: "API Integration", type: "Backend & APIs", icon: "API" },
+  { name: "React.js", type: "Frontend", icon: "R" },
+  { name: "HTML5", type: "Frontend", icon: "H5" },
+  { name: "CSS3", type: "Frontend", icon: "C3" },
+  { name: "Supabase SQL", type: "Databases", icon: "S" },
+  { name: "SQLite", type: "Databases", icon: "SQ" },
+  { name: "Cloud Deployment", type: "Cloud & Development", icon: "CD" },
+  { name: "CI/CD", type: "Cloud & Development", icon: "CI" },
 ];
 
 const services = [
@@ -93,6 +111,36 @@ const services = [
     Sparkles,
     "/mazhai-boutique/saree-editorial.svg",
   ],
+  [
+    "AI & RAG Solutions",
+    "Build intelligent applications using LLMs, RAG pipelines, embeddings, vector databases, and custom knowledge bases.",
+    Sparkles,
+    "/mazhai-boutique/project-cover.svg",
+  ],
+  [
+    "AI Assistant Development",
+    "Create custom AI assistants that understand natural-language requests and connect with business systems and APIs.",
+    Code2,
+    "/mazhai-boutique/homepage.png",
+  ],
+  [
+    "MCP Integration",
+    "Build MCP servers and integrations that allow AI assistants to securely interact with external tools and services.",
+    Layers3,
+    "/mazhai-boutique/collections.png",
+  ],
+  [
+    "LLM & AI Application Development",
+    "Develop practical AI-powered applications for automation, customer support, business workflows, and productivity.",
+    Zap,
+    "/mazhai-boutique/saree-editorial.svg",
+  ],
+  [
+    "API & Third-Party Integrations",
+    "Connect applications with services such as Gmail, WhatsApp, payment systems, databases, and other third-party APIs.",
+    Server,
+    "/mazhai-boutique/project-cover.svg",
+  ],
 ];
 
 const approach = [
@@ -120,6 +168,63 @@ const aiFeatures = [
   "Natural-language saree and occasion discovery",
   "Personalized recommendations based on preferences",
   "Smart style guidance and size assistance",
+];
+const aiProjects = [
+  {
+    title: "SASPAL RAG-Based AI Chatbot",
+    category: "AI / Generative AI",
+    description:
+      "Built a Retrieval-Augmented Generation (RAG) chatbot for the SASPAL website that retrieves relevant company information from a knowledge base and uses an LLM to generate accurate, context-aware responses for website visitors.",
+    technologies: [
+      "Python",
+      "RAG",
+      "LLM",
+      "Embeddings",
+      "Vector Database",
+      "OpenRouter",
+      "React",
+      "FastAPI",
+    ],
+    features: [
+      "Knowledge-base powered responses",
+      "Semantic search using embeddings",
+      "RAG pipeline for contextual answers",
+      "LLM-powered response generation",
+      "SASPAL company and service information integration",
+      "Website chatbot interface",
+    ],
+    icon: Sparkles,
+    website: "https://www.saspal.com/",
+    previewImage: "/saspal-rag-chatbot.jpg",
+  },
+  {
+    title: "SASPAL Email AI Assistant",
+    category: "AI / MCP / Automation",
+    description:
+      "Developed an AI-powered email assistant using Model Context Protocol (MCP) to connect with Gmail. The assistant allows users to interact with their emails using natural-language commands, retrieve relevant messages, summarize emails, and prepare and send emails through a controlled workflow.",
+    technologies: [
+      "Python",
+      "MCP",
+      "Gmail API",
+      "LLM",
+      "AI Agents",
+      "REST APIs",
+      "JavaScript",
+      "HTML",
+      "CSS",
+    ],
+    features: [
+      "Gmail integration through MCP",
+      "Natural-language email search",
+      "Email summarization",
+      "AI-powered email assistance",
+      "Email sending workflow with confirmation",
+      "Secure handling of sensitive email information",
+      "MCP-based tool integration",
+    ],
+    icon: Server,
+    previewImage: "/saspal-gmail-ai-assistant.png",
+  },
 ];
 const educationProjects = [
   [
@@ -337,8 +442,9 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-8 max-w-xl text-base leading-7 text-ink/65 md:text-lg">
-              I am Visvaeswaraiya Jayakumar, a Full Stack Web Developer building
-              modern, responsive and high-performance web experiences.
+              I am Visvaeswaraiya Jayakumar, a Full Stack Developer | AI
+              Engineer | RAG &amp; LLM Developer building modern, responsive
+              web experiences and practical AI applications.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <a
@@ -428,15 +534,19 @@ export default function Home() {
           <div className="max-w-3xl">
             <Reveal delay={80}>
               <p className="text-2xl leading-tight tracking-[-.03em] md:text-4xl">
-                I am a Full Stack Web Developer focused on building modern,
-                responsive and user-friendly websites and web applications.
+                I build modern full-stack websites and AI-powered applications,
+                combining thoughtful interfaces with practical RAG and LLM
+                solutions.
               </p>
             </Reveal>
             <Reveal delay={160}>
               <p className="mt-7 max-w-xl leading-7 text-ink/60">
-                I enjoy turning ideas into practical digital experiences using
-                modern web technologies, with a strong focus on clean interfaces,
-                performance and usability.
+                I enjoy turning ideas into practical digital experiences, with
+                a strong focus on clean interfaces, performance and usability.
+              </p>
+              <p className="mt-4 max-w-xl font-mono text-xs leading-6 text-ink/55 md:text-sm">
+                React • Node.js • Python • AI • LLM • RAG • MCP • APIs •
+                Supabase • Cloud
               </p>
             </Reveal>
             <div className="mt-10 grid grid-cols-2 gap-6 border-t border-ink/10 pt-6 text-sm text-ink/60 md:grid-cols-3">
@@ -451,7 +561,7 @@ export default function Home() {
               <Reveal delay={120}>
                 <div className="transition-transform duration-300 hover:-translate-y-1">
                   <strong className="block font-display text-2xl text-ink">
-                    <Counter value={13} format={(n) => String(n).padStart(2, "0")} />
+                    <Counter value={skills.length} format={(n) => String(n).padStart(2, "0")} />
                   </strong>
                   Core technologies
                 </div>
@@ -637,13 +747,14 @@ export default function Home() {
           <p className="section-label">04 / Selected work</p>
           <div className="mt-4 flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <h2 className="font-display text-4xl tracking-[-.04em] md:text-6xl">
-              One project,
+              Selected work,
               <br />
               <span className="text-coral">carefully made.</span>
             </h2>
             <p className="max-w-sm text-sm leading-6 text-ink/60">
-              A closer look at a full stack e-commerce experience. More work
-              will be added here over time.
+              A closer look at full-stack and AI-powered work, including
+              practical solutions for e-commerce, knowledge search and
+              automation.
             </p>
           </div>
           <div className="mt-12 grid gap-8 lg:grid-cols-[1.15fr_.85fr]">
@@ -662,7 +773,7 @@ export default function Home() {
               <div>
                 <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-ink/50">
                   <span>E-commerce website</span>
-                  <span>01 / 01</span>
+                  <span>01 / 03</span>
                 </div>
                 <h3 className="mt-10 font-display text-4xl tracking-[-.04em]">
                   Mazhai Boutique
@@ -736,6 +847,91 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="mt-12 space-y-12">
+            {aiProjects.map((project, index) => {
+              const ProjectIcon = project.icon;
+              return (
+                <div
+                  key={project.title}
+                  className="grid gap-8 lg:grid-cols-[1.15fr_.85fr]"
+                >
+                  <Reveal delay={index * 100}>
+                    <div className="group overflow-hidden rounded-[2px] border border-ink/10 bg-white/50 transition-transform duration-300 hover:-translate-y-1">
+                      {project.previewImage && (
+                        <img
+                          src={project.previewImage}
+                          alt={`${project.title} project preview`}
+                          className="aspect-[4/3] w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                        />
+                      )}
+                    </div>
+                  </Reveal>
+                  <Reveal delay={index * 100 + 120}>
+                    <div className="flex flex-col justify-between border-t border-ink/15 pt-5 lg:border-l lg:border-t-0 lg:pl-8">
+                      <div>
+                        <div className="flex items-center justify-between gap-4 text-[10px] font-mono uppercase tracking-widest text-ink/50">
+                          <span className="flex items-center gap-2">
+                            <ProjectIcon size={15} className="text-coral" />
+                            {project.category}
+                          </span>
+                          <span>0{index + 2} / 03</span>
+                        </div>
+                        <h3 className="mt-8 font-display text-3xl tracking-[-.04em] sm:text-4xl">
+                          {project.title}
+                        </h3>
+                        <p className="mt-5 text-sm leading-7 text-ink/65">
+                          {project.description}
+                        </p>
+                        <div className="mt-7 flex flex-wrap gap-2">
+                          {project.technologies.map((technology) => (
+                            <span
+                              className="rounded-full border border-ink/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 hover:-translate-y-0.5 hover:border-coral hover:text-coral"
+                              key={technology}
+                            >
+                              {technology}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mt-8 border-t border-ink/10 pt-6">
+                        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-ink/45">
+                          Project features
+                        </p>
+                        <div className="grid gap-y-3 text-sm text-ink/65 sm:grid-cols-2 sm:gap-x-4">
+                          {project.features.map((feature) => (
+                            <span
+                              className="flex items-start gap-2"
+                              key={feature}
+                            >
+                              <Check
+                                size={14}
+                                className="mt-0.5 shrink-0 text-coral"
+                              />
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+                        {project.website && (
+                          <a
+                            href={project.website}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="group mt-6 inline-flex items-center gap-2 text-sm font-bold text-coral transition-transform duration-300 hover:-translate-y-0.5"
+                          >
+                            Visit SASPAL website
+                            <ExternalLink
+                              size={15}
+                              className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5"
+                            />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </Reveal>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -831,7 +1027,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="font-display text-3xl">
-                    Full Stack Web Developer
+                    Full Stack Developer | AI Engineer
                   </h3>
                   <p className="mt-1 font-mono text-xs uppercase tracking-widest text-coral">
                     Mazhai Boutique
@@ -923,7 +1119,7 @@ export default function Home() {
               VJ<span className="text-coral">.</span>
             </a>
             <p className="mt-2 text-xs text-paper/45">
-              Visvaeswaraiya Jayakumar / Full Stack Web Developer
+              Visvaeswaraiya Jayakumar / Full Stack Developer | AI Engineer
             </p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-paper/55">

@@ -10,8 +10,9 @@ const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
 
 export const metadata: Metadata = {
-  title: "Visvaeswaraiya Jayakumar | Full Stack Web Developer",
-  description: "Portfolio of Visvaeswaraiya Jayakumar, a Full Stack Web Developer in India.",
+  title: "Visvaeswaraiya Jayakumar | Full Stack Developer | AI Engineer",
+  description:
+    "Portfolio of Visvaeswaraiya Jayakumar, a Full Stack Developer and AI Engineer building AI, RAG, LLM and web applications in India.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
